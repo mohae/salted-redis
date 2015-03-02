@@ -3,6 +3,7 @@
 redis-server:
   enabled: True
   version: 2.8.19
+  work: /tmp/redis
   root: /etc/redis
   var: /etc/redis
   port: 6379
