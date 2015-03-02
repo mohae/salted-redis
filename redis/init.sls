@@ -34,12 +34,17 @@ download-redis:
     - require:
       - pkg: redis-dependencies
 
-redis-make-install:
+redis-make:
   cmd.wait:
+    - watch:
+      - archive: download-redis
     - cwd: {{ root }}/redis-{{ version }}
     - names:
       - make
-      - make install
-    - require:
-      - archive: download-redis
-{% endif %}
+      - cp src/redis-server /usr/local/bin/
+      - cp src/redis-cli /usr/local/bin/
+      - cp src/redis-server /usr/local/bin/
+      - cp src/redis-sentinel /usr/local/bin/
+      - cp src/redis-benchmakr /usr/local/bin/
+      - cp src/redis-check-aof /usr/local/bin/
+      - cp src/redis-check-dump /usr/local/bin/
