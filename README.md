@@ -7,10 +7,9 @@ This is a redis formula. Some of the design decisions are based on https://githu
 ## About
 This formula is designed to enable the installation of any supported Redis release from source, which defaults to the current stable release. This can be changed by specifiying another release number and its corresponding checksum in the pillar.
 
-The end result, using the default settings, is a 
+The end result, using the default settings, is redis installed as a service consistent with [the redis quickstart instructions](http://redis.io/topics/quickstart). The only deviation from the quickstart is that all redis executables from the compile are copied to `/usr/local/bin`.
+ 
 Installation from package is not supported and will not be supported. 
-
-The final installation will include all of the Redis executables being placed in `/user/local/bin/`. 
 
 The formula currently depends on `init.d` for service management. This is not meant as a statement or comment for or against `upstart` or `systemd`; `init.d` is what is documented in Redis' quick start page. 
 
