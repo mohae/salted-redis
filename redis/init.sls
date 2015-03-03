@@ -3,13 +3,14 @@
 
 {% if salt['pillar.get']('redis-server:enabled') %}
 {% set version = salt['pillar.get']('redis-server:version', 'redis-stable') %}
-{% set work = salt['pillar.get']('redis-server:work', '/tmp/redis') %}
+{% set checksum_info = salt['pillar.get']('redis-checksums:redis-' + version + '-checksum', {}) %}
+{% set algo = checksum_info.get('algo', 'sha1') %}
+{% set checksum = checksum_info.get('checksum', '') %}
+{% set loglevel = salt['pillar.get']('redis-server:loglevel', "notice") %}
+{% set port = salt['pillar.get']('redis-server:port', 6379) %}
 {% set root = salt['pillar.get']('redis-server:root', '/etc/redis') %}
 {% set var = salt['pillar.get']('redis-server:var', '/etc/var') %}
-{% set port = salt['pillar.get']('redis-server:port', 6379) %}
-{% set checksum_info = salt['pillar.get']('redis-checksums:redis-' + version + '-checksum', {}) %}
-{% set checksum = checksum_info.get('checksum', '') %}
-{% set algo = checksum_info.get('algo', 'sha1') %}
+{% set work = salt['pillar.get']('redis-server:work', '/tmp/redis') %}
 
 redis-{{ version }}-dependencies:
   pkg.installed:
@@ -43,7 +44,7 @@ make-redis-{{ version }}:
     - names:
       - make
 
-copy-redis-{{ version }}-executables:
+redis-{{ version }}-executables:
   cmd.wait:
     - watch:
       - cmd: make-redis-{{ version }}
@@ -59,12 +60,78 @@ copy-redis-{{ version }}-executables:
 
 config-redis-{{ version }}-executables:
   cmd.wait:
-    - watch:
-      - cmd: copy-redis-{{ version }}-executables
+    - cwd: {{ work }}/redis-{{ version }}
     - names:
       - mkdir {{ root }}
     {% if root != var %}
       - mkdir {{ var }}
     {% endif %}
+      - cp  utils/redis_init_script /etc/init.d/redis_{{ port }}
+      - cp redis.conf {{ root }}/{{ port }}.conf
+      - update-rc.d redis_{{ port }} defaults
+    - watch:
+      - cmd: redis-{{ version }}-executables
+
+create-redis-{{ version }}-wd:
+  cmd.wait:
+    - names:
+      - mkdir {{ var }}/{{ port }}
+    - watch:
+      - cmd: config-redis-{{ version }}-executables
+
+redis-{{ version }}-config-daemonize:
+  file.replace:
+    - name: {{ root }}/{{ port }}.conf
+    - pattern: "daemonize no"
+    - repl: "daemonize yes"
+    - require:
+      - cmd: config-redis-{{ version }}-executables
+
+redis-{{ version }}-config-pidfile:
+  file.replace:
+    - name: {{ root }}/{{ port }}.conf
+    - pattern: "pidfile /var/run/redis.pid"
+    - repl: "pidfile /var/run/redis_{{ port }}.pid"
+    - require:
+      - cmd: config-redis-{{ version }}-executables
+
+redis-{{ version }}-config-port:
+  file.replace:
+    - name: {{ root }}/{{ port }}.conf
+    - pattern: "port 6379"
+    - repl: "port {{ port }}"
+    - require:
+      - cmd: config-redis-{{ version }}-executables
+
+redis-{{ version }}-config-loglevel:
+  file.replace:
+    - name: {{ root }}/{{ port }}.conf
+    - pattern: "loglevel notice"
+    - repl: "loglevel {{ loglevel }}"
+    - require:
+      - cmd: config-redis-{{ version }}-executables
+
+redis-{{ version }}-config-logfile:
+  file.replace:
+    - name: {{ root }}/{{ port }}.conf
+    - pattern: "logfile \"\""
+    - repl: "logfile \"/var/log/redis_{{ port }}.log\""
+    - require:
+      - cmd: config-redis-{{ version }}-executables
+
+redis-{{ version }}-config-dir:
+  file.replace:
+    - name: {{ root }}/{{ port }}.conf
+    - pattern: "dir ./"
+    - repl: "dir {{ var }}/{{ port }}"
+    - require:
+      - cmd: config-redis-{{ version }}-executables
+
+redis_{{ port }}:
+  service.running:
+    - enable: True
+    - reload: True
+    - watch:
+      - cmd: redis-{{ version }}-executables
 
 {% endif %}  

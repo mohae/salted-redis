@@ -2,11 +2,12 @@
 # 
 redis-server:
   enabled: True
-  version: redis-stable
-  work: /tmp/redis
+  loglevel: notice
+  port: 6379
   root: /etc/redis
   var: /etc/redis
-  port: 6379
+  work: /tmp/redis
+  version: stable
 
 redis-checksums:
   redis-2.6.17-checksum:
