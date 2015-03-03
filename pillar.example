@@ -2,7 +2,7 @@
 # 
 redis-server:
   enabled: True
-  version: 2.8.19
+  version: redis-stable
   work: /tmp/redis
   root: /etc/redis
   var: /etc/redis
@@ -95,4 +95,8 @@ redis-checksums:
 
   redis-3.0.0.rc1-checksum:
     checksum: f0934db86791e32053f8b21ddec5965793edff19
+    algo: sha1
+
+  redis-stable-checksum:
+    checksum: 8ad74084113c78faa97c47e7dac195f4b3991e1e
     algo: sha1

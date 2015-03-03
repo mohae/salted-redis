@@ -2,7 +2,7 @@
 # Installs redis based on the pillar settings.
 
 {% if salt['pillar.get']('redis-server:enabled') %}
-{% set version = salt['pillar.get']('redis-server:version', {}) %}
+{% set version = salt['pillar.get']('redis-server:version', 'redis-stable') %}
 {% set work = salt['pillar.get']('redis-server:work', '/tmp/redis') %}
 {% set root = salt['pillar.get']('redis-server:root', '/etc/redis') %}
 {% set var = salt['pillar.get']('redis-server:var', '/etc/var') %}
