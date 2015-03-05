@@ -21,7 +21,31 @@ For an example, please refer to the redis states in the base pillar of my [saltb
 ## Pillar
 The included `pillar.example` includes everything needed for the formula to install Redis 2.8.19 and the checksums for all other currently supported versions. For customization of the Redis installation in your environment, only the `redis-server` portion needs to be changed. The `redis-checksum` contains all currently valid checksums.
 
+`redis-server`: ID for server configuration settings.
+`enabled`: Boolean for whether or not Redis is enabled. If it is, redis will be installed and configured.
+`loglevel`: The loglevel to use. Default: notice
+`port`: The port that redis will be listening on. Default: 6379
+`root`: The root directory for redis. Default: /etc/redis
+`var`: The var directory for redis. Default: /etc/redis
+`work`: The work directory for redis installs. This is where redis is downloaded and compiled. Default: /tmp/redis
+`version`: The version of redis that will be installed. Default: stable.
+
+`redis-checksums`: ID for the checksums of the various redis versions. These are mostly obtained from [redis-hashes](https://github.com/antirez/redis-hashes). Each checksum has its own id in the form of `redis-release-checksum`, with the exception of `redis-stable`, whose id is `redis-stable-checksum`.
+`checksum`: The checksum of the release tarball.
+`algo`: The algorithm for the checksum, currently all checksums are `sha1`.
+
 If there are recent releases that are not part of the `redis-checksum`, either file an issue or submit a pull request.
+
+Please refer to `pillar.example` for a complete pillar. My [salted](https://github.com/mohae/salted) repo splits the example pillar up into two separate pillar states: `server.sls` and `checksums.sls`. As a result, the structure of salted's pillar for redis is:
+
+```
+pillar\redis
+pillar\redis\init.sls
+pillar\redis\checksums.sls
+pillar\redis\server.sls
+```
+
+That is just a preference on my part, putting all of the pillar information in `pillar/redis.sls` or `pillar/redis/init.sls` works too.
 
 ### Pillar note
 The checksum for stable may be out of sync if there has been a recent stable release for Redis. If an error occurs becuase the downloaded file's checksum does not match the checksum for `stable`, please either file an issue or a pull request with the updated checksum. 
