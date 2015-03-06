@@ -1,11 +1,11 @@
 README
 ======
 
-## `redis-formula-mohae`
-This is a redis formula. Some of the design decisions are based on https://github.com/saltstack-formulas/redis-formula. As such, there may be pieces that do not make a lot of sense, because, frankly, I found a lot that didn't make sense in the original formula.
+## `salted-redis`
+A salt state to install redis as a service.
 
 ## About
-This formula is designed to enable the installation of any supported Redis release from source, which defaults to the current stable release. This can be changed by specifiying another release number and its corresponding checksum in the pillar.
+This state is designed to enable the installation of any supported Redis release from source, which defaults to the current stable release. This can be changed by specifiying another release number and its corresponding checksum in the pillar.
 
 The end result, using the default settings, is redis installed as a service consistent with [the redis quickstart instructions](http://redis.io/topics/quickstart). The only deviation from the quickstart is that all redis executables from the compile are copied to `/usr/local/bin`.
  
@@ -14,12 +14,12 @@ Installation from package is not supported and will not be supported.
 The formula currently depends on `init.d` for service management. This is not meant as a statement or comment for or against `upstart` or `systemd`; `init.d` is what is documented in Redis' quick start page. 
 
 ## Usage
-Use as you would other Saltstack Formulas. Create a pillar file or files for this formula to customize the installation to suit your needs. _At minimum, the checksums portion of the `pillar.example` file is required._
+Add this state to your salt repo and create a pillar file or files for this state to customize the installation to suit your needs. _At minimum, the checksums portion of the `pillar.example` file is required._
 
 For an example, please refer to the redis states in the base pillar of my [saltbase](https://github.com/mohae/saltbase) repo.  
 
 ## Pillar
-The included `pillar.example` includes everything needed for the formula to install Redis 2.8.19 and the checksums for all other currently supported versions. For customization of the Redis installation in your environment, only the `redis-server` portion needs to be changed. The `redis-checksum` contains all currently valid checksums.
+The included `pillar.example` includes everything needed for the state to install the current Redis stable release and the checksums for all other currently supported versions. For customization of the Redis installation in your environment, only the `redis-server` portion needs to be changed. The `redis-checksum` contains all currently valid checksums.
 
 `redis-server`: ID for server configuration settings.
 `enabled`: Boolean for whether or not Redis is enabled. If it is, redis will be installed and configured.
