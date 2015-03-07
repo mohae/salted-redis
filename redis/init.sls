@@ -1,12 +1,12 @@
-﻿# salt/dev/redis/init.sls
+﻿# redis/init.sls
 # Installs redis based on the pillar settings.
 
 {% if salt['pillar.get']('redis-server:enabled') %}
-{% set version = salt['pillar.get']('redis-server:version', 'redis-stable') %}
+{% set version = salt['pillar.get']('redis-server:version', '2.8.19') %}
 {% set checksum_info = salt['pillar.get']('redis-checksums:redis-' + version + '-checksum', {}) %}
 {% set algo = checksum_info.get('algo', 'sha1') %}
-{% set checksum = checksum_info.get('checksum', '') %}
-{% set loglevel = salt['pillar.get']('redis-server:loglevel', "notice") %}
+{% set checksum = checksum_info.get('checksum', '3e362f4770ac2fdbdce58a5aa951c1967e0facc8') %}
+{% set loglevel = salt['pillar.get']('redis-server:loglevel', 'notice') %}
 {% set port = salt['pillar.get']('redis-server:port', 6379) %}
 {% set root = salt['pillar.get']('redis-server:root', '/etc/redis') %}
 {% set var = salt['pillar.get']('redis-server:var', '/etc/var') %}
@@ -31,7 +31,6 @@ download-redis-{{ version }}:
     - source: http://download.redis.io/releases/redis-{{ version }}.tar.gz
     - source_hash: {{ algo }}={{ checksum }}
     - archive_format: tar
-#    - tar_options: zv
     - if_missing: {{ work }}/redis-{{ version }}
     - require:
       - pkg: redis-{{ version }}-dependencies
@@ -40,7 +39,8 @@ make-redis-{{ version }}:
   cmd.wait:
     - watch:
       - archive: download-redis-{{ version }}
-    - cwd: {{ work }}/redis-{{ version }}
+#    - cwd: {{ work }}/redis-{{ version }}
+    - cwd: {{ work }}
     - names:
       - make
 
